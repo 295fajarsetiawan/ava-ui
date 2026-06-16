@@ -30,6 +30,14 @@ export function App() {
 }
 ```
 
+Kalau kamu render dari Next.js Server Component, pakai komponen yang server-safe dari `ava-ui/server`.
+
+```tsx
+import { Card, SectionHeading } from "ava-ui/server";
+```
+
+Komponen interaktif seperti `Header`, `Select`, `DataGrid`, `Modal`, `Sidebar`, dan `Carousel` tetap dipakai di Client Component lewat `ava-ui`.
+
 Dokumentasi penggunaan semua komponen tersedia di [docs/components.md](docs/components.md).
 
 ## Development

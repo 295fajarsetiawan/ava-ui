@@ -12,9 +12,15 @@ export default defineConfig({
   ],
   build: {
     lib: {
-      entry: resolve(__dirname, "src/index.ts"),
+      entry: {
+        index: resolve(__dirname, "src/index.ts"),
+        server: resolve(__dirname, "src/server.ts")
+      },
       name: "MyReactComponents",
-      fileName: (format) => (format === "cjs" ? "index.cjs" : "index.js"),
+      fileName: (format, entryName) => {
+        const suffix = format === "cjs" ? "cjs" : "js";
+        return entryName === "server" ? `server.${suffix}` : `index.${suffix}`;
+      },
       formats: ["es", "cjs"]
     },
     rollupOptions: {
