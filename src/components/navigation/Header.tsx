@@ -121,17 +121,41 @@ function ChevronIcon() {
   );
 }
 
+function MenuIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round">
+      <path d="M4 6h16" />
+      <path d="M4 12h16" />
+      <path d="M4 18h16" />
+    </svg>
+  );
+}
+
+function CloseIcon() {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round">
+      <path d="M6 6l12 12" />
+      <path d="M18 6 6 18" />
+    </svg>
+  );
+}
+
 function renderAction(action: HeaderAction) {
   const content = (
     <>
-      {action.icon ? <span className="rpc-header__action-icon">{action.icon}</span> : null}
-      <span className="rpc-sr-only">{action.label}</span>
+      {action.icon ? <span className="inline-flex items-center justify-center text-inherit">{action.icon}</span> : null}
+      <span className="sr-only">{action.label}</span>
     </>
   );
 
   if (action.href && !action.disabled) {
     return (
-      <a aria-label={action.label} className="rpc-header__icon-action" href={action.href} key={action.id}>
+      <a
+        aria-label={action.label}
+        className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-colors duration-200 hover:bg-[#FAF7F2] hover:text-[#8A704C]"
+        href={action.href}
+        key={action.id}
+      >
         {content}
       </a>
     );
@@ -140,7 +164,7 @@ function renderAction(action: HeaderAction) {
   return (
     <button
       aria-label={action.label}
-      className="rpc-header__icon-action"
+      className="inline-flex h-10 w-10 items-center justify-center rounded-full text-gray-600 transition-colors duration-200 hover:bg-[#FAF7F2] hover:text-[#8A704C]"
       disabled={action.disabled}
       key={action.id}
       onClick={action.onClick}
@@ -152,7 +176,10 @@ function renderAction(action: HeaderAction) {
 }
 
 function renderMenuItem(item: HeaderProfileMenuItem) {
-  const className = cx("rpc-header__profile-menu-item", item.danger && "rpc-header__profile-menu-item--danger");
+  const className = cx(
+    "block rounded-xl px-3 py-2 text-left text-sm font-semibold transition-colors duration-200",
+    item.danger ? "text-rose-500 hover:bg-rose-50" : "text-gray-700 hover:bg-[#F7F2EB]"
+  );
 
   if (item.href && !item.disabled) {
     return (
@@ -201,18 +228,15 @@ export function Header({
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [internalSearch, setInternalSearch] = useState(search && search.defaultValue ? search.defaultValue : "");
   const navPanelId = useId();
+  const searchInputId = useId();
   const headerRef = useRef<HTMLElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const isSearchControlled = Boolean(search && search.value !== undefined);
   const searchValue = search ? (isSearchControlled ? search.value ?? "" : internalSearch) : "";
   const headerStyle = {
-    "--rpc-header-accent": accentColor,
-    "--rpc-header-bg": background,
-    "--rpc-header-border": borderColor,
-    "--rpc-header-height": height,
-    "--rpc-header-max-width": maxWidth,
-    "--rpc-header-muted": mutedColor,
-    "--rpc-header-text": textColor,
+    background,
+    color: textColor,
+    borderBottomColor: borderColor,
     ...style
   } as CSSProperties;
 
@@ -268,29 +292,91 @@ export function Header({
   const closeMenu = () => setIsMenuOpen(false);
 
   const brandNode = brandHref ? (
-    <a className="rpc-header__brand" href={brandHref}>
+    <a
+      className="select-none whitespace-nowrap font-serif text-[clamp(1.7rem,2.8vw,3rem)] font-bold italic tracking-[-0.045em] drop-shadow-[0_2px_3px_rgba(90,69,28,0.2)]"
+      href={brandHref}
+      style={{ color: accentColor }}
+    >
       {brand}
     </a>
   ) : (
-    <div className="rpc-header__brand">{brand}</div>
+    <div
+      className="select-none whitespace-nowrap font-serif text-[clamp(1.7rem,2.8vw,3rem)] font-bold italic tracking-[-0.045em] drop-shadow-[0_2px_3px_rgba(90,69,28,0.2)]"
+      style={{ color: accentColor }}
+    >
+      {brand}
+    </div>
   );
 
   return (
-    <header className={cx("rpc-header", className)} ref={headerRef} style={headerStyle} {...props}>
-      <div className="rpc-header__inner">
-        <div className="rpc-header__brand-area">
+    <header className={cx("sticky top-0 z-40 border-b border-[#E5DACE]/100 bg-[#FDFBF7]/95 backdrop-blur-md", className)} ref={headerRef} style={headerStyle} {...props}>
+      <div className="mx-auto flex h-auto max-w-7xl items-center gap-4 px-4 py-4 sm:px-6 lg:px-8" style={{ minHeight: height, maxWidth }}>
+        <div className="flex min-w-0 flex-1 items-center gap-3">
           {brandNode}
         </div>
 
-        <div className="rpc-header__utility">
+        <nav className="hidden flex-1 items-center justify-center gap-8 lg:flex" aria-label="Primary navigation">
+          {navItems.map((item) => {
+            const isActive = item.active ?? activeNavId === item.id;
+            const baseClass = cx(
+              "border-b-2 px-1 py-1 text-xs font-bold uppercase tracking-[0.24em] transition-all duration-300",
+              isActive
+                ? "text-[#D4AF37]"
+                : "border-transparent text-gray-600 hover:border-[#D4AF37] hover:text-[#D4AF37]"
+            );
+            const activeStyle = isActive ? { borderBottomColor: accentColor, color: accentColor } : undefined;
+
+            if (item.href && !item.disabled) {
+              return (
+                <a
+                  className={baseClass}
+                  href={item.href}
+                  key={item.id}
+                  style={activeStyle}
+                  onClick={() => {
+                    closeMenu();
+                    item.onClick?.();
+                  }}
+                >
+                  {item.label}
+                </a>
+              );
+            }
+
+            return (
+              <button
+                className={baseClass}
+                disabled={item.disabled}
+                key={item.id}
+                style={activeStyle}
+                onClick={() => {
+                  closeMenu();
+                  item.onClick?.();
+                }}
+                type="button"
+              >
+                {item.label}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="ml-auto flex items-center gap-2 sm:gap-3">
+          {actions.length ? <div className="flex items-center gap-2">{actions.map(renderAction)}</div> : null}
+
           {search ? (
-            <form className="rpc-header__search" onSubmit={submitSearch} role="search">
-              <label className="rpc-sr-only" htmlFor="rpc-header-search">
+            <form
+              className="hidden items-center rounded-sm border border-[#E5DACE] bg-[#F7F2EB] px-3 py-1.5 transition-all focus-within:border-[#D4AF37] md:flex"
+              onSubmit={submitSearch}
+              role="search"
+            >
+              <label className="sr-only" htmlFor={searchInputId}>
                 {search.label ?? "Search"}
               </label>
               <SearchIcon />
               <input
-                id="rpc-header-search"
+                className="w-24 bg-transparent text-xs text-gray-800 outline-none transition-all placeholder:text-gray-400 focus:w-36"
+                id={searchInputId}
                 onChange={(event) => updateSearch(event.target.value)}
                 placeholder={search.placeholder ?? "Cari..."}
                 type="search"
@@ -299,30 +385,30 @@ export function Header({
             </form>
           ) : null}
 
-          {actions.length ? <div className="rpc-header__actions">{actions.map(renderAction)}</div> : null}
-
           {isAuthenticated ? (
-            <div className="rpc-header__profile" ref={profileRef}>
+            <div className="relative hidden md:block" ref={profileRef}>
               <button
                 aria-expanded={isProfileOpen}
+                aria-haspopup="menu"
                 aria-label={profileMenuLabel}
-                className="rpc-header__profile-trigger"
+                className="inline-flex min-h-10 items-center gap-2 rounded-full px-1 pr-3 font-sans text-sm font-semibold text-white shadow-sm transition-colors duration-200"
+                style={{ backgroundColor: mutedColor, borderColor: mutedColor }}
                 onClick={() => setIsProfileOpen((value) => !value)}
                 type="button"
               >
-                <span className="rpc-header__avatar">
+                <span className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-white text-sm font-bold text-[#8A704C]">
                   {profile?.avatarSrc ? <img alt={profile.avatarAlt ?? ""} src={profile.avatarSrc} /> : profile?.avatar ?? "A"}
                 </span>
-                <span className="rpc-header__profile-name">{profile?.name ?? "Profile"}</span>
+                <span className="hidden whitespace-nowrap lg:inline">{profile?.name ?? "Profile"}</span>
                 <ChevronIcon />
               </button>
 
               {isProfileOpen ? (
-                <div className="rpc-header__profile-menu">
-                  {profile?.email ? <div className="rpc-header__profile-email">{profile.email}</div> : null}
+                <div className="absolute right-0 top-[calc(100%+0.5rem)] z-20 grid min-w-[220px] gap-1 rounded-2xl border border-[#E5DACE] bg-[#FFF8F1] p-2 shadow-[0_20px_42px_rgba(71,51,28,0.18)]">
+                  {profile?.email ? <div className="border-b border-[#E5DACE] px-3 pb-3 pt-2 text-xs text-gray-600">{profile.email}</div> : null}
                   {profileMenuItems.map(renderMenuItem)}
                   {onLogout ? (
-                    <button className="rpc-header__profile-menu-item rpc-header__profile-menu-item--danger" onClick={onLogout} type="button">
+                    <button className="rounded-xl px-3 py-2 text-left text-sm font-semibold text-rose-500 transition-colors duration-200 hover:bg-rose-50" onClick={onLogout} type="button">
                       {logoutLabel}
                     </button>
                   ) : null}
@@ -330,12 +416,22 @@ export function Header({
               ) : null}
             </div>
           ) : (
-            <div className="rpc-header__auth">
-              <button className="rpc-header__auth-button rpc-header__auth-button--login" onClick={onLogin} type="button">
+            <div className="hidden items-center gap-2 md:flex">
+              <button
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold text-white shadow-sm transition-all duration-200"
+                onClick={onLogin}
+                style={{ backgroundColor: mutedColor, borderColor: mutedColor }}
+                type="button"
+              >
                 <LoginIcon />
                 <span>{loginLabel}</span>
               </button>
-              <button className="rpc-header__auth-button rpc-header__auth-button--register" onClick={onRegister} type="button">
+              <button
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-all duration-200 hover:bg-[#FAF7F2]"
+                onClick={onRegister}
+                style={{ borderColor: "#D5C7B3", color: mutedColor }}
+                type="button"
+              >
                 <RegisterIcon />
                 <span>{registerLabel}</span>
               </button>
@@ -347,23 +443,25 @@ export function Header({
               aria-controls={navPanelId}
               aria-expanded={isMenuOpen}
               aria-label="Toggle navigation"
-              className="rpc-header__menu-toggle"
+              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[#5A4B3A] transition-colors duration-200 hover:bg-[#FAF7F2] md:hidden"
               onClick={() => setIsMenuOpen((value) => !value)}
               type="button"
             >
-              <span />
-              <span />
-              <span />
+              {isMenuOpen ? <CloseIcon /> : <MenuIcon />}
             </button>
           ) : null}
         </div>
 
         {navItems.length ? (
-          <div className={cx("rpc-header__nav-panel", isMenuOpen && "rpc-header__nav-panel--open")} id={navPanelId}>
-            <nav className="rpc-header__nav" aria-label="Primary navigation">
+          <div className={cx("md:hidden", isMenuOpen ? "block" : "hidden")} id={navPanelId}>
+            <nav className="mt-3 grid gap-2 border-t border-[#E5DACE] pt-3" aria-label="Primary navigation">
               {navItems.map((item) => {
                 const isActive = item.active ?? activeNavId === item.id;
-                const className = cx("rpc-header__nav-link", isActive && "rpc-header__nav-link--active");
+                const className = cx(
+                  "rounded-xl px-3 py-3 text-left text-sm font-semibold transition-colors duration-200",
+                  isActive ? "bg-[#F7F2EB]" : "text-gray-700 hover:bg-[#F7F2EB]"
+                );
+                const activeStyle = isActive ? { color: accentColor } : undefined;
 
                 if (item.href && !item.disabled) {
                   return (
@@ -371,6 +469,7 @@ export function Header({
                       className={className}
                       href={item.href}
                       key={item.id}
+                      style={activeStyle}
                       onClick={() => {
                         closeMenu();
                         item.onClick?.();
@@ -386,6 +485,7 @@ export function Header({
                     className={className}
                     disabled={item.disabled}
                     key={item.id}
+                    style={activeStyle}
                     onClick={() => {
                       closeMenu();
                       item.onClick?.();
@@ -397,6 +497,46 @@ export function Header({
                 );
               })}
             </nav>
+
+            {search ? (
+              <form className="mt-3 flex items-center rounded-sm border border-[#E5DACE] bg-[#F7F2EB] px-3 py-2 transition-all focus-within:border-[#D4AF37] md:hidden" onSubmit={submitSearch} role="search">
+                <label className="sr-only" htmlFor={`${searchInputId}-mobile`}>
+                  {search.label ?? "Search"}
+                </label>
+                <SearchIcon />
+                <input
+                  className="w-full bg-transparent text-xs text-gray-800 outline-none placeholder:text-gray-400"
+                  id={`${searchInputId}-mobile`}
+                  onChange={(event) => updateSearch(event.target.value)}
+                  placeholder={search.placeholder ?? "Cari..."}
+                  type="search"
+                  value={searchValue}
+                />
+              </form>
+            ) : null}
+
+            {!isAuthenticated ? (
+              <div className="mt-3 grid gap-2 md:hidden">
+                <button
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold text-white transition-colors duration-200"
+                  onClick={onLogin}
+                  style={{ backgroundColor: mutedColor, borderColor: mutedColor }}
+                  type="button"
+                >
+                  <LoginIcon />
+                  <span>{loginLabel}</span>
+                </button>
+                <button
+                  className="inline-flex items-center justify-center gap-1.5 rounded-full border px-4 py-2 text-xs font-semibold transition-all duration-200 hover:bg-[#FAF7F2]"
+                  onClick={onRegister}
+                  style={{ borderColor: "#D5C7B3", color: mutedColor }}
+                  type="button"
+                >
+                  <RegisterIcon />
+                  <span>{registerLabel}</span>
+                </button>
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
