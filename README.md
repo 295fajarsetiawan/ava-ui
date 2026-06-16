@@ -39,6 +39,21 @@ npm install
 npm run dev
 ```
 
+## Demo Deploy
+
+Demo lokal dibangun dari `src/demo.tsx`. Untuk deploy ke GitHub Pages:
+
+```bash
+npm run build:demo
+```
+
+GitHub Actions akan otomatis membangun demo dan push hasilnya ke branch `gh-pages`.
+Setelah GitHub Pages di repo settings diaktifkan ke branch `gh-pages`, demo akan tersedia di:
+
+```text
+https://295fajarsetiawan.github.io/ava-ui/
+```
+
 ## Build
 
 ```bash

@@ -20,6 +20,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -p tsconfig.build.json && vite build",
+    "build:demo": "vite build --config vite.demo.config.ts",
     "preview": "vite preview",
     "typecheck": "tsc --noEmit"
   },
