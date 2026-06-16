@@ -280,21 +280,6 @@ export function Header({
       <div className="rpc-header__inner">
         <div className="rpc-header__brand-area">
           {brandNode}
-
-          {navItems.length ? (
-            <button
-              aria-controls={navPanelId}
-              aria-expanded={isMenuOpen}
-              aria-label="Toggle navigation"
-              className="rpc-header__menu-toggle"
-              onClick={() => setIsMenuOpen((value) => !value)}
-              type="button"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
-          ) : null}
         </div>
 
         <div className="rpc-header__utility">
@@ -356,6 +341,21 @@ export function Header({
               </button>
             </div>
           )}
+
+          {navItems.length ? (
+            <button
+              aria-controls={navPanelId}
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle navigation"
+              className="rpc-header__menu-toggle"
+              onClick={() => setIsMenuOpen((value) => !value)}
+              type="button"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          ) : null}
         </div>
 
         {navItems.length ? (

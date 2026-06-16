@@ -2356,25 +2356,7 @@ function Dt({
     H.preventDefault(), l && ((Q = l.onSubmit) == null || Q.call(l, G));
   }, de = () => R(!1), ue = a ? /* @__PURE__ */ e("a", { className: "rpc-header__brand", href: a, children: r }) : /* @__PURE__ */ e("div", { className: "rpc-header__brand", children: r });
   return /* @__PURE__ */ e("header", { className: ze("rpc-header", D), ref: U, style: m, ...h, children: /* @__PURE__ */ c("div", { className: "rpc-header__inner", children: [
-    /* @__PURE__ */ c("div", { className: "rpc-header__brand-area", children: [
-      ue,
-      t.length ? /* @__PURE__ */ c(
-        "button",
-        {
-          "aria-controls": K,
-          "aria-expanded": E,
-          "aria-label": "Toggle navigation",
-          className: "rpc-header__menu-toggle",
-          onClick: () => R((H) => !H),
-          type: "button",
-          children: [
-            /* @__PURE__ */ e("span", {}),
-            /* @__PURE__ */ e("span", {}),
-            /* @__PURE__ */ e("span", {})
-          ]
-        }
-      ) : null
-    ] }),
+    /* @__PURE__ */ e("div", { className: "rpc-header__brand-area", children: ue }),
     /* @__PURE__ */ c("div", { className: "rpc-header__utility", children: [
       l ? /* @__PURE__ */ c("form", { className: "rpc-header__search", onSubmit: Z, role: "search", children: [
         /* @__PURE__ */ e("label", { className: "rpc-sr-only", htmlFor: "rpc-header-search", children: l.label ?? "Search" }),
@@ -2421,7 +2403,23 @@ function Dt({
           /* @__PURE__ */ e(et, {}),
           /* @__PURE__ */ e("span", { children: u })
         ] })
-      ] })
+      ] }),
+      t.length ? /* @__PURE__ */ c(
+        "button",
+        {
+          "aria-controls": K,
+          "aria-expanded": E,
+          "aria-label": "Toggle navigation",
+          className: "rpc-header__menu-toggle",
+          onClick: () => R((H) => !H),
+          type: "button",
+          children: [
+            /* @__PURE__ */ e("span", {}),
+            /* @__PURE__ */ e("span", {}),
+            /* @__PURE__ */ e("span", {})
+          ]
+        }
+      ) : null
     ] }),
     t.length ? /* @__PURE__ */ e("div", { className: ze("rpc-header__nav-panel", E && "rpc-header__nav-panel--open"), id: K, children: /* @__PURE__ */ e("nav", { className: "rpc-header__nav", "aria-label": "Primary navigation", children: t.map((H) => {
       const Q = H.active ?? n === H.id, le = ze("rpc-header__nav-link", Q && "rpc-header__nav-link--active");
