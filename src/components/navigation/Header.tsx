@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useId,
   useRef,
   useState,
   type CSSProperties,
@@ -199,6 +200,8 @@ export function Header({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [internalSearch, setInternalSearch] = useState(search && search.defaultValue ? search.defaultValue : "");
+  const navPanelId = useId();
+  const headerRef = useRef<HTMLElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const isSearchControlled = Boolean(search && search.value !== undefined);
   const searchValue = search ? (isSearchControlled ? search.value ?? "" : internalSearch) : "";
@@ -215,7 +218,15 @@ export function Header({
 
   useEffect(() => {
     const handlePointerDown = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+
+      if (headerRef.current && !headerRef.current.contains(target)) {
+        setIsMenuOpen(false);
+        setIsProfileOpen(false);
+        return;
+      }
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
         setIsProfileOpen(false);
       }
     };
@@ -254,6 +265,8 @@ export function Header({
     }
   };
 
+  const closeMenu = () => setIsMenuOpen(false);
+
   const brandNode = brandHref ? (
     <a className="rpc-header__brand" href={brandHref}>
       {brand}
@@ -263,24 +276,90 @@ export function Header({
   );
 
   return (
-    <header className={cx("rpc-header", className)} style={headerStyle} {...props}>
+    <header className={cx("rpc-header", className)} ref={headerRef} style={headerStyle} {...props}>
       <div className="rpc-header__inner">
-        {brandNode}
+        <div className="rpc-header__brand-area">
+          {brandNode}
 
-        <button
-          aria-expanded={isMenuOpen}
-          aria-label="Toggle navigation"
-          className="rpc-header__menu-toggle"
-          onClick={() => setIsMenuOpen((value) => !value)}
-          type="button"
-        >
-          <span />
-          <span />
-          <span />
-        </button>
-
-        <div className={cx("rpc-header__content", isMenuOpen && "rpc-header__content--open")}>
           {navItems.length ? (
+            <button
+              aria-controls={navPanelId}
+              aria-expanded={isMenuOpen}
+              aria-label="Toggle navigation"
+              className="rpc-header__menu-toggle"
+              onClick={() => setIsMenuOpen((value) => !value)}
+              type="button"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          ) : null}
+        </div>
+
+        <div className="rpc-header__utility">
+          {search ? (
+            <form className="rpc-header__search" onSubmit={submitSearch} role="search">
+              <label className="rpc-sr-only" htmlFor="rpc-header-search">
+                {search.label ?? "Search"}
+              </label>
+              <SearchIcon />
+              <input
+                id="rpc-header-search"
+                onChange={(event) => updateSearch(event.target.value)}
+                placeholder={search.placeholder ?? "Cari..."}
+                type="search"
+                value={searchValue}
+              />
+            </form>
+          ) : null}
+
+          {actions.length ? <div className="rpc-header__actions">{actions.map(renderAction)}</div> : null}
+
+          {isAuthenticated ? (
+            <div className="rpc-header__profile" ref={profileRef}>
+              <button
+                aria-expanded={isProfileOpen}
+                aria-label={profileMenuLabel}
+                className="rpc-header__profile-trigger"
+                onClick={() => setIsProfileOpen((value) => !value)}
+                type="button"
+              >
+                <span className="rpc-header__avatar">
+                  {profile?.avatarSrc ? <img alt={profile.avatarAlt ?? ""} src={profile.avatarSrc} /> : profile?.avatar ?? "A"}
+                </span>
+                <span className="rpc-header__profile-name">{profile?.name ?? "Profile"}</span>
+                <ChevronIcon />
+              </button>
+
+              {isProfileOpen ? (
+                <div className="rpc-header__profile-menu">
+                  {profile?.email ? <div className="rpc-header__profile-email">{profile.email}</div> : null}
+                  {profileMenuItems.map(renderMenuItem)}
+                  {onLogout ? (
+                    <button className="rpc-header__profile-menu-item rpc-header__profile-menu-item--danger" onClick={onLogout} type="button">
+                      {logoutLabel}
+                    </button>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : (
+            <div className="rpc-header__auth">
+              <button className="rpc-header__auth-button rpc-header__auth-button--login" onClick={onLogin} type="button">
+                <LoginIcon />
+                <span>{loginLabel}</span>
+              </button>
+              <button className="rpc-header__auth-button rpc-header__auth-button--register" onClick={onRegister} type="button">
+                <RegisterIcon />
+                <span>{registerLabel}</span>
+              </button>
+            </div>
+          )}
+        </div>
+
+        {navItems.length ? (
+          <div className={cx("rpc-header__nav-panel", isMenuOpen && "rpc-header__nav-panel--open")} id={navPanelId}>
             <nav className="rpc-header__nav" aria-label="Primary navigation">
               {navItems.map((item) => {
                 const isActive = item.active ?? activeNavId === item.id;
@@ -288,82 +367,38 @@ export function Header({
 
                 if (item.href && !item.disabled) {
                   return (
-                    <a className={className} href={item.href} key={item.id} onClick={item.onClick}>
+                    <a
+                      className={className}
+                      href={item.href}
+                      key={item.id}
+                      onClick={() => {
+                        closeMenu();
+                        item.onClick?.();
+                      }}
+                    >
                       {item.label}
                     </a>
                   );
                 }
 
                 return (
-                  <button className={className} disabled={item.disabled} key={item.id} onClick={item.onClick} type="button">
+                  <button
+                    className={className}
+                    disabled={item.disabled}
+                    key={item.id}
+                    onClick={() => {
+                      closeMenu();
+                      item.onClick?.();
+                    }}
+                    type="button"
+                  >
                     {item.label}
                   </button>
                 );
               })}
             </nav>
-          ) : null}
-
-          <div className="rpc-header__right">
-            {search ? (
-              <form className="rpc-header__search" onSubmit={submitSearch} role="search">
-                <label className="rpc-sr-only" htmlFor="rpc-header-search">
-                  {search.label ?? "Search"}
-                </label>
-                <SearchIcon />
-                <input
-                  id="rpc-header-search"
-                  onChange={(event) => updateSearch(event.target.value)}
-                  placeholder={search.placeholder ?? "Cari..."}
-                  type="search"
-                  value={searchValue}
-                />
-              </form>
-            ) : null}
-
-            {actions.length ? <div className="rpc-header__actions">{actions.map(renderAction)}</div> : null}
-
-            {isAuthenticated ? (
-              <div className="rpc-header__profile" ref={profileRef}>
-                <button
-                  aria-expanded={isProfileOpen}
-                  aria-label={profileMenuLabel}
-                  className="rpc-header__profile-trigger"
-                  onClick={() => setIsProfileOpen((value) => !value)}
-                  type="button"
-                >
-                  <span className="rpc-header__avatar">
-                    {profile?.avatarSrc ? <img alt={profile.avatarAlt ?? ""} src={profile.avatarSrc} /> : profile?.avatar ?? "A"}
-                  </span>
-                  <span className="rpc-header__profile-name">{profile?.name ?? "Profile"}</span>
-                  <ChevronIcon />
-                </button>
-
-                {isProfileOpen ? (
-                  <div className="rpc-header__profile-menu">
-                    {profile?.email ? <div className="rpc-header__profile-email">{profile.email}</div> : null}
-                    {profileMenuItems.map(renderMenuItem)}
-                    {onLogout ? (
-                      <button className="rpc-header__profile-menu-item rpc-header__profile-menu-item--danger" onClick={onLogout} type="button">
-                        {logoutLabel}
-                      </button>
-                    ) : null}
-                  </div>
-                ) : null}
-              </div>
-            ) : (
-              <div className="rpc-header__auth">
-                <button className="rpc-header__auth-button rpc-header__auth-button--login" onClick={onLogin} type="button">
-                  <LoginIcon />
-                  <span>{loginLabel}</span>
-                </button>
-                <button className="rpc-header__auth-button rpc-header__auth-button--register" onClick={onRegister} type="button">
-                  <RegisterIcon />
-                  <span>{registerLabel}</span>
-                </button>
-              </div>
-            )}
           </div>
-        </div>
+        ) : null}
       </div>
     </header>
   );
