@@ -30,6 +30,8 @@ export function App() {
 }
 ```
 
+Dokumentasi penggunaan semua komponen tersedia di [docs/components.md](docs/components.md).
+
 ## Development
 
 ```bash
