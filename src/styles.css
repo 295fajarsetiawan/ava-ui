@@ -4402,6 +4402,28 @@
   .rpc-datagrid--mobile-auto.rpc-datagrid--card-tablet .rpc-datagrid__cards {
     display: grid;
   }
+
+  .rpc-header__inner {
+    gap: 0.7rem;
+    grid-template-areas: "brand utility";
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-rows: auto;
+    padding: 0.9rem 1rem;
+  }
+
+  .rpc-header__nav-panel,
+  .rpc-header__menu-toggle {
+    display: none;
+  }
+
+  .rpc-header__search {
+    width: min(15.5rem, 30vw);
+  }
+
+  .rpc-header__auth-button {
+    min-height: 2.45rem;
+    padding: 0.55rem 0.95rem;
+  }
 }
 
 @media (max-width: 640px) {
@@ -4480,14 +4502,13 @@
   }
 
   .rpc-header__inner {
-    gap: 0.75rem;
+    gap: 0.65rem;
     grid-template-areas:
-      "brand toggle"
-      "nav nav"
-      "utility utility";
+      "brand utility"
+      "nav nav";
     grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-rows: auto auto auto;
-    padding: 0.95rem 1rem 1rem;
+    grid-template-rows: auto auto;
+    padding: 0.8rem 0.95rem 0.9rem;
   }
 
   .rpc-header__brand-area {
@@ -4523,35 +4544,23 @@
     display: none;
   }
 
-  .rpc-header__utility,
-  .rpc-header__actions,
-  .rpc-header__auth {
-    align-items: stretch;
-    flex-direction: column;
-    justify-content: stretch;
-    width: 100%;
-  }
-
   .rpc-header__utility {
-    gap: 0.8rem;
+    align-items: center;
+    gap: 0.45rem;
   }
 
   .rpc-header__search,
-  .rpc-header__auth-button,
-  .rpc-header__profile-trigger {
-    width: 100%;
-  }
-
-  .rpc-header__search {
-    justify-content: flex-start;
+  .rpc-header__auth {
+    display: none;
   }
 
   .rpc-header__actions {
     flex-direction: row;
+    gap: 0.45rem;
   }
 
   .rpc-header__profile {
-    width: 100%;
+    margin-left: 0;
   }
 
   .rpc-header__profile-menu {
@@ -4562,19 +4571,23 @@
   }
 
   .rpc-header__brand {
-    font-size: clamp(1.2rem, 5vw, 1.55rem);
+    font-size: clamp(1.35rem, 7vw, 1.75rem);
   }
 
-  .rpc-header__auth {
-    gap: 0.5rem;
+  .rpc-header__action-icon,
+  .rpc-header__icon-action {
+    height: 2.35rem;
+    width: 2.35rem;
   }
 
-  .rpc-header__auth-button {
-    justify-content: center;
+  .rpc-header__profile-trigger {
+    min-height: 2.35rem;
+    padding: 0.3rem;
   }
 
-  .rpc-header__actions {
-    justify-content: flex-start;
+  .rpc-header__profile-name,
+  .rpc-header__profile-trigger svg {
+    display: none;
   }
 
   .rpc-sidebar {
