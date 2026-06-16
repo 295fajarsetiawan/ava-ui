@@ -8,7 +8,7 @@
 npm install ava-ui
 ```
 
-Kalau package ini dipakai langsung dari GitHub sebelum publish ke npm, gunakan:
+Kalau pakai langsung dari GitHub, gunakan:
 
 ```bash
 npm install git+https://github.com/295fajarsetiawan/ava-ui.git
@@ -61,3 +61,4 @@ npm publish
 - React dan React DOM harus tetap sebagai `peerDependencies`.
 - Style utama dibundle lewat `ava-ui/styles.css`.
 - Public export ada di `src/index.ts`.
+- Saat package di-install dari GitHub, `prepare` akan membangun `dist/` otomatis.
