@@ -61,4 +61,4 @@ npm publish
 - React dan React DOM harus tetap sebagai `peerDependencies`.
 - Style utama dibundle lewat `ava-ui/styles.css`.
 - Public export ada di `src/index.ts`.
-- Saat package di-install dari GitHub, `prepare` akan membangun `dist/` otomatis.
+- Saat package di-install dari GitHub, `dist/` sudah ikut di repo jadi langsung bisa dipakai.
